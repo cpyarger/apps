@@ -1,0 +1,60 @@
+##
+# This file contains Values.yaml content that gets added to the output of questions.yaml
+# It's ONLY meant for content that the user is NOT expected to change.
+# Example: Everything under "image" is not included in questions.yaml but is included here.
+##
+
+image:
+  repository: vabene1111/recipes
+  pullPolicy: IfNotPresent
+  tag: 0.17.2@sha256:01e5f436ac192ee1cca996e628a3dee1029b99f7b4489bdeeaaf74aaf923538e
+
+envTpl:
+  DB_ENGINE: "django.db.backends.postgresql"
+  POSTGRES_DB: "{{ .Values.postgresql.postgresqlDatabase }}"
+  POSTGRES_USER: "{{ .Values.postgresql.postgresqlUsername }}"
+  POSTGRES_PORT: "5432"
+
+envValueFrom:
+  POSTGRES_PASSWORD:
+    secretKeyRef:
+      name: dbcreds
+      key: postgresql-password
+  POSTGRES_HOST:
+    secretKeyRef:
+      name: dbcreds
+      key: plainhost
+
+additionalContainers:
+  nginx:
+    name: nginx
+    image: "{{ .Values.nginxImage.repository }}:{{ .Values.nginxImage.tag }}"
+    ports:
+      - containerPort: 80
+        name: main
+    volumeMounts:
+    - name: recipes-config
+      mountPath: /etc/nginx/nginx.conf
+      subPath: nginx-config
+      readOnly: true
+    - name: media
+      mountPath: '/media'
+    - name: static
+      mountPath: '/static'
+
+# Enabled postgres
+postgresql:
+  enabled: true
+  existingSecret: "dbcreds"
+  postgresqlUsername: recipes
+  postgresqlDatabase: recipes
+  persistence:
+    db:
+      storageClass: "SCALE-ZFS"
+    dbbackups:
+      storageClass: "SCALE-ZFS"
+
+##
+# Most other defaults are set in questions.yaml
+# For other options please refer to the wiki, default_values.yaml or the common library chart
+##

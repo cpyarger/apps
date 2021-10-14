@@ -1,0 +1,41 @@
+##
+# This file contains Values.yaml content that gets added to the output of questions.yaml
+# It's ONLY meant for content that the user is NOT expected to change.
+# Example: Everything under "image" is not included in questions.yaml but is included here.
+##
+
+image:
+  repository: ghcr.io/nicholaswilde/odoo
+  pullPolicy: IfNotPresent
+  tag: version-14.0@sha256:f66aa76c1070f1d71da0e96a8b1dd1e41ab00d4ae61692d7dfc2267b6f1f1244
+
+
+envTpl:
+  USER: "{{ .Values.postgresql.postgresqlUsername }}"
+
+envValueFrom:
+  PASSWORD:
+    secretKeyRef:
+      name: dbcreds
+      key: postgresql-password
+  HOST:
+    secretKeyRef:
+      name: dbcreds
+      key: plainhost
+
+# Enabled postgres
+postgresql:
+  enabled: true
+  existingSecret: "dbcreds"
+  postgresqlUsername: odoo
+  postgresqlDatabase: postgres
+  persistence:
+    db:
+      storageClass: "SCALE-ZFS"
+    dbbackups:
+      storageClass: "SCALE-ZFS"
+
+##
+# Most other defaults are set in questions.yaml
+# For other options please refer to the wiki, default_values.yaml or the common library chart
+##

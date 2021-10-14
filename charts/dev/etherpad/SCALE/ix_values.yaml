@@ -1,0 +1,43 @@
+##
+# This file contains Values.yaml content that gets added to the output of questions.yaml
+# It's ONLY meant for content that the user is NOT expected to change.
+# Example: Everything under "image" is not included in questions.yaml but is included here.
+##
+
+image:
+  repository: ghcr.io/nicholaswilde/etherpad
+  pullPolicy: IfNotPresent
+  tag: version-1.8.14@sha256:cd35863f12695934a55d60e6cd2ee70489e14445af1b84ade79333a524265323
+
+envTpl:
+  DB_TYPE: "postgres"
+  DB_NAME: "{{ .Values.postgresql.postgresqlDatabase }}"
+  DB_USER: "{{ .Values.postgresql.postgresqlUsername }}"
+  DB_PORT: "5432"
+
+envValueFrom:
+  DB_PASS:
+    secretKeyRef:
+      name: dbcreds
+      key: postgresql-password
+  DB_HOST:
+    secretKeyRef:
+      name: dbcreds
+      key: plainhost
+
+# Enabled postgres
+postgresql:
+  enabled: true
+  existingSecret: "dbcreds"
+  postgresqlUsername: etherpad
+  postgresqlDatabase: etherpad
+  persistence:
+      db:
+      storageClass: "SCALE-ZFS"
+    dbbackups:
+      storageClass: "SCALE-ZFS"
+
+##
+# Most other defaults are set in questions.yaml
+# For other options please refer to the wiki, default_values.yaml or the common library chart
+##

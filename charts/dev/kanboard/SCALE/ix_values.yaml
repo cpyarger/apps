@@ -1,0 +1,45 @@
+##
+# This file contains Values.yaml content that gets added to the output of questions.yaml
+# It's ONLY meant for content that the user is NOT expected to change.
+# Example: Everything under "image" is not included in questions.yaml but is included here.
+##
+
+image:
+  repository: kanboard/kanboard
+  pullPolicy: IfNotPresent
+  tag: v1.2.20@sha256:d6d3bab5ca3f079ca782a7dc63e370e0ee3a006c596ba51ff6beb24d051528fc
+
+envTpl:
+  DB_DRIVER: "postgres"
+  DB_NAME: "{{ .Values.postgresql.postgresqlDatabase }}"
+  DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername }}"
+  DB_PORT: "5432"
+
+envValueFrom:
+  DB_PASSWORD:
+    secretKeyRef:
+      name: dbcreds
+      key: postgresql-password
+  DB_HOSTNAME:
+    secretKeyRef:
+      name: dbcreds
+      key: plainhost
+
+# -- Enable and configure postgresql database subchart under this key.
+# @default -- See values.yaml
+postgresql:
+  enabled: true
+  existingSecret: "dbcreds"
+  postgresqlUsername: kanboard
+  postgresqlDatabase: kanboard
+  persistence:
+    db:
+        storageClass: "SCALE-ZFS"
+    dbbackups:
+      storageClass: "SCALE-ZFS"
+
+
+##
+# Most other defaults are set in questions.yaml
+# For other options please refer to the wiki, default_values.yaml or the common library chart
+##

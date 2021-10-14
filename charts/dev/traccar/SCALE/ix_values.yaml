@@ -1,0 +1,43 @@
+##
+# This file contains Values.yaml content that gets added to the output of questions.yaml
+# It's ONLY meant for content that the user is NOT expected to change.
+# Example: Everything under "image" is not included in questions.yaml but is included here.
+##
+
+image:
+  repository: traccar/traccar
+  pullPolicy: IfNotPresent
+  tag: 4.14@sha256:35e733a6a3cab6089cd7b28749ba3483f26d43d392a2606e416409d97d360a55
+
+envTpl:
+  DATABASE_DRIVER: "org.postgresql.Driver"
+  DATABASE_USER: "{{ .Values.postgresql.postgresqlUsername }}"
+
+envValueFrom:
+  DATABASE_PASSWORD:
+    secretKeyRef:
+      name: dbcreds
+      key: postgresql-password
+  DATABASE_URL:
+    secretKeyRef:
+      name: dbcreds
+      key: jdbc
+
+
+# Enabled postgres
+postgresql:
+  enabled: true
+  existingSecret: "dbcreds"
+  postgresqlUsername: traccar
+  postgresqlDatabase: traccar
+  persistence:
+    db:
+      storageClass: "SCALE-ZFS"
+    dbbackups:
+      storageClass: "SCALE-ZFS"
+
+
+##
+# Most other defaults are set in questions.yaml
+# For other options please refer to the wiki, default_values.yaml or the common library chart
+##

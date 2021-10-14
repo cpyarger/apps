@@ -1,0 +1,45 @@
+##
+# This file contains Values.yaml content that gets added to the output of questions.yaml
+# It's ONLY meant for content that the user is NOT expected to change.
+# Example: Everything under "image" is not included in questions.yaml but is included here.
+##
+
+image:
+  repository: xirixiz/dsmr-reader-docker
+  pullPolicy: IfNotPresent
+  tag: latest-2021.09.02-amd64@sha256:4858edb1ae63a20639a0ef9c51c7b2cf599686db5c582ead7b37b2a288122935
+
+envTpl:
+  DJANGO_TIME_ZONE: "{{ .Values.env.TZ }}"
+  DJANGO_DATABASE_ENGINE: "django.db.backends.postgresql"
+  DJANGO_DATABASE_NAME: "{{ .Values.postgresql.postgresqlDatabase }}"
+  DJANGO_DATABASE_USER: "{{ .Values.postgresql.postgresqlUsername }}"
+  DJANGO_DATABASE_PORT: "5432"
+
+envValueFrom:
+  DJANGO_DATABASE_PASSWORD:
+    secretKeyRef:
+      name: dbcreds
+      key: postgresql-password
+  DJANGO_DATABASE_HOST:
+    secretKeyRef:
+      name: dbcreds
+      key: plainhost
+
+# -- Enable and configure postgresql database subchart under this key.
+# @default -- See values.yaml
+postgresql:
+  enabled: true
+  existingSecret: "dbcreds"
+  postgresqlUsername: dsmr-reader
+  postgresqlDatabase: dsmr-reader
+  persistence:
+    db:
+      storageClass: "SCALE-ZFS"
+    dbbackups:
+      storageClass: "SCALE-ZFS"
+
+##
+# Most other defaults are set in questions.yaml
+# For other options please refer to the wiki, default_values.yaml or the common library chart
+##
