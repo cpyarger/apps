@@ -29,6 +29,7 @@ gui/static/
 /sbin/
 src/middlewared/build/
 src/middlewared/dist/
+
 src/middlewared/middlewared.egg-info/
 .git-repo-setting
 nas_source/
